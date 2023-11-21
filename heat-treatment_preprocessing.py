@@ -36,5 +36,29 @@ df.columns = ['CP_control_OP', 'Drying_OP_1', 'Drying_OP_2', 'Drying_Temp_1','Dr
 'Salt_Bath_Temp_2']
 df.columns
 
-#
+# data information
+df.info()
+df.describe()
 
+# Check missing values
+ # 1. Using IQR and change Lower, Upper limit
+from ft_col import outlier_test
+
+df.plot(kind = 'box')
+outlire_result_box = df.apply(outlier_test)
+outlire_result_box.sum(axis=1)
+(outlire_result_box.sum(axis = 1)<2).sum() #1.5
+#bc_drop_id[outlier_result.sum(axis = 1)<2]
+
+outlire_result_box.sum().sum()
+
+df['Drying_Temp_1'].plot(kind = 'box')
+
+
+# corr(feature selection)
+corr = df.corr()
+corr[abs(corr) > 0.5]
+df.corr()['Quenching_Temp_3']['Quenching_CP_Monitor']
+df_diff = df[['Quenching_Temp_3','Quenching_CP_Monitor']]
+df_diff.describe()
+corr[['Quenching_Temp_3','Quenching_CP_Monitor']]
