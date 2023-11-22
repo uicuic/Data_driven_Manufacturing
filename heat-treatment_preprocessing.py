@@ -38,7 +38,7 @@ df.columns
 
 # data information
 df.info()
-df.describe()
+des = df.describe()
 
 # Check missing values
  # 1. Using IQR and change Lower, Upper limit
@@ -55,10 +55,68 @@ outlire_result_box.sum().sum()
 df['Drying_Temp_1'].plot(kind = 'box')
 
 
-# corr(feature selection)
+# corr(feature selection)EDA(Exploratory Data Analysis) 
 corr = df.corr()
+corr['CP_control_OP']
 corr[abs(corr) > 0.5]
 df.corr()['Quenching_Temp_3']['Quenching_CP_Monitor']
 df_diff = df[['Quenching_Temp_3','Quenching_CP_Monitor']]
 df_diff.describe()
 corr[['Quenching_Temp_3','Quenching_CP_Monitor']]
+
+
+df.head()
+
+df_s = df_sample.head(10000)
+df_r_s = df.head(10000)
+
+
+import matplotlib.pyplot as plt
+
+plt.plot(df_r_s.index, df_r_s['Quenching_OP_1'])
+
+# relation of cp_op and q_cp
+import seaborn as sns
+plot = df[['CP_control_OP','Quenching_CP']]
+# Scatter plot - pairplot()
+sns.pairplot()
+
+    # remove Salt_Sludge_Removal
+corr['Salt_Sludge_Removal']
+
+# make cp to dependent variable
+df[df['Quenching_CP'] < 0.2]
+
+
+
+
+# unsupervised learning and check relation with 'Quenching_CP'
+
+df_cluster = df.drop(columns = ['Salt_Sludge_Removal'])
+
+from sklearn.cluster import KMeans
+k_means=KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300, n_clusters=2, n_init=10, random_state=None, tol=0.0001, verbose=0)
+k_means.fit(df_cluster)
+predict_cluster=k_means.predict(df_cluster)
+cluster_label = pd.Series(predict_cluster)
+df_cluster['label'] = cluster_label
+
+df_cluster.columns
+df_cluster.label.value_counts()
+
+# groupby with label
+group_cluseter = df_cluster.groupby('label')
+group_mean = group_cluseter.mean()
+df_cluster.head(100000)
+
+
+
+# IsolationForest for search outlire
+
+from sklearn.ensemble import IsolationForest
+clf = IsolationForest(max_features = 25, contamination=0.01)  # contamination 파라미터는 이상치의 비율을 설정합니다.
+clf.fit(df_cluster)
+outliers = clf.predict(df_cluster) 
+outliers_series = pd.Series(predict_cluster)
+outliers_series.value_counts()
+
